@@ -8,7 +8,8 @@ Telegram-бот, преобразующий текстовые запросы н
 - установите гит репозиторий на локальную машину и перейдите в корневую директорию
 
 ```bash
-cd text-to-sql-telegram-bot
+git clone https://github.com/mafooll/FuturistProject.git
+cd FuturistProject
 ```
 
 - заполните `.env.example` своими данными
