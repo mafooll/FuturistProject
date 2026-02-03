@@ -1,0 +1,82 @@
+[project]
+name = "text-to-sql-telegram-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiogram>=3.23.0",
+    "alembic>=1.17.2",
+    "asyncpg>=0.31.0",
+    "dependency-injector>=4.48.3",
+    "ijson>=3.4.0.post0",
+    "openai>=2.11.0",
+    "pydantic-settings>=2.12.0",
+    "sqlalchemy[asyncio]>=2.0.45",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.12.0",
+    "mypy>=1.19.0",
+    "pgcli>=4.3.0",
+    "psycopg[binary]>=3.3.2",
+    "ruff>=0.14.8",
+]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ['pydantic.mypy']
+strict = true
+implicit_reexport = false  
+explicit_package_bases = true
+
+
+[tool.black]
+line-length = 80
+target-version = ["py313"]
+skip-string-normalization = false
+
+
+[tool.ruff]
+line-length = 80
+target-version = "py313"
+src = ["src", "tests"]
+exclude = [
+    "migrations",
+    "locales",
+    "docs",
+]
+
+[tool.ruff.lint]
+select = [
+    "F",   # ошибки pyflakes — неопределённые переменные, лишние импорты
+    "E",   # ошибки стиля (pycodestyle)
+    "W",   # предупреждения стиля (pycodestyle)
+    "I",   # isort — автоупорядочивание импортов
+    "UP",  # pyupgrade — обновление синтаксиса под современный Python
+    "B",   # flake8-bugbear — реальные баги (опасные места)
+    "C4",  # flake8-comprehensions — оптимизация list/dict comps
+    "SIM", # flake8-simplify — предложения упростить код
+    "RET", # flake8-return — проверка корректных return
+    "ARG", # обнаружение неиспользуемых аргументов
+    "C90", # цикломатическая сложность (сложные функции)
+    "D",   # pydocstyle — проверки докстрингов
+]
+extend-select = [
+    "UP035", # deprecated импорты
+    "UP036", # Optional[X] -> X | None
+    "UP034", # modern typing (list[...] → list[...] вместо List)
+]
+ignore = [
+    "D100",  # не требовать докстринг модуля
+    "D104",  # не требовать докстринг пакета
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true         # импорт a as b группируется корректно
+force-sort-within-sections = true # строгий порядок внутри секций импорта
+
+
+# [tool.ruff.lint.pydocstyle]
+# convention = "google"

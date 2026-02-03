@@ -1,0 +1,89 @@
+services:
+  postgres_container:
+    image: postgres:15
+    container_name: postgres_database
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    env_file:
+      - .env
+
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_RW}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+    networks:
+      - database_network
+
+  alembic_container:
+    container_name: alembic_migrations
+
+    profiles:
+      - tools
+
+    depends_on:
+      postgres_container:
+        condition: service_healthy
+
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: alembic
+
+      args:
+        USER_ID: ${UID:-1000}
+        GROUP_ID: ${GID:-1000}
+
+    working_dir: /src
+
+    env_file:
+      - .env
+
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_RW}
+
+    volumes:
+      - ./migrations:/src/migrations:rw
+      - ./src:/src/src:ro
+      - ./pyproject.toml:/src/pyproject.toml:ro
+      - ./uv.lock:/src/uv.lock:ro
+
+    networks:
+      - database_network
+
+  bot_container:
+    container_name: telegram_bot
+    restart: unless-stopped
+
+    depends_on:
+      postgres_container:
+        condition: service_healthy
+
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: bot
+
+    working_dir: /src
+
+    env_file:
+      - .env
+
+    networks:
+      - database_network
+
+volumes:
+  database_data:
+
+networks:
+  database_network:
